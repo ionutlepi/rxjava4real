@@ -16,17 +16,17 @@ class RXApi(
 ) {
 
     private fun createSingleForCall(apiCaller: ApiCaller): Single<CallResult> {
-        return Single.create<CallResult> { emmiter ->
+        return Single.create<CallResult> { emitter ->
             apiCaller.execute(object : Callback {
                 override fun onCallFinished(result: CallResult) {
-                    if (emmiter.isDisposed) {
+                    if (emitter.isDisposed) {
                         //nothing to do if disposed
                         return
                     }
                     if (result.successful) {
-                        emmiter.onSuccess(result)
+                        emitter.onSuccess(result)
                     } else {
-                        emmiter.onError(CallError())
+                        emitter.onError(CallError())
                     }
                 }
             })
