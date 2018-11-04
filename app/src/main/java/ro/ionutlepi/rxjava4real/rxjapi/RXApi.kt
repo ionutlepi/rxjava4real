@@ -2,6 +2,7 @@ package ro.ionutlepi.rxjava4real.rxjapi
 
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.SingleTransformer
 import ro.ionutlepi.rxjava4real.api.ApiInstance
 import ro.ionutlepi.rxjava4real.api.CallResult
 import ro.ionutlepi.rxjava4real.api.Callback
@@ -49,18 +50,25 @@ class RXApi(
                         it
                     )
                 )
-            }.flatMap { wifiByte ->
-                val state: WifiState = when (wifiByte.data[0]) {
+            }
+            .compose(parseWifiState())
+    }
+
+    fun parseWifiState(): SingleTransformer<CallResult, WifiState> {
+        return SingleTransformer { singleWifi ->
+            singleWifi.flatMap {
+                val state: WifiState = when (it.data[0]) {
                     1.toByte() -> WifiState.CONNECTED
                     2.toByte() -> WifiState.DISCONNECTED
                     3.toByte() -> WifiState.NO_INTERNET
                     else -> null
                 } ?: return@flatMap Single.error<WifiState>(
                     InvalidWifiState(
-                        wifiByte.data[0]
+                        it.data[0]
                     )
                 )
                 return@flatMap Single.just(state)
             }
+        }
     }
 }
