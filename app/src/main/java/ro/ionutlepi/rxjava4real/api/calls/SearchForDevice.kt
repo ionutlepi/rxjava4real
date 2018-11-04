@@ -12,13 +12,6 @@ class SearchForDevice(private val apiInstance: ApiInstance, private val iotDevic
         super.execute(cb)
         val transaction = StartSearchCall(iotDeviceRef)
         apiInstance.registerCaller(this)
-        apiInstance.executeCall(transaction, object : Callback {
-            override fun onCallFinished(result: CallResult) {
-                if (!result.successful) {
-                    cb.onCallFinished(result)
-                }
-                //otherwise we wait, we know that the scann just started
-            }
-        })
+        apiInstance.executeCall(transaction, cb)
     }
 }
