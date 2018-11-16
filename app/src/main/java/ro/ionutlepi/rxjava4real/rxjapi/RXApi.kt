@@ -17,23 +17,7 @@ import ro.ionutlepi.rxjava4real.api.calls.SearchForDevice
 class RXApi(
     private val apiInstance: ApiInstance = ApiInstance()
 ) {
-    private fun createSingleForCall(apiCaller: ApiCaller): Single<CallResult> {
-        return Single.create<CallResult> { emitter ->
-            apiCaller.execute(object : Callback {
-                override fun onCallFinished(result: CallResult) {
-                    if (emitter.isDisposed) {
-                        //nothing to do if disposed
-                        return
-                    }
-                    if (result.successful) {
-                        emitter.onSuccess(result)
-                    } else {
-                        emitter.onError(CallError())
-                    }
-                }
-            })
-        }
-    }
+    private fun createSingleForCall(apiCaller: ApiCaller): Single<CallResult> = ApiCallSingle.create(apiCaller)
 
     fun auth(): Completable = createSingleForCall(ApiAuth(apiInstance)).ignoreElement()
 
